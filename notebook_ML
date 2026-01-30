@@ -1,0 +1,72 @@
+# Breast Cancer Classification with KNN
+# آموزش طبقه‌بندی سرطان سینه با الگوریتم KNN
+
+# ۱) بارگذاری کتابخانه‌ها
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
+
+# ۲) بارگذاری دیتاست
+data = load_breast_cancer()
+X = data.data       # ویژگی‌ها
+y = data.target     # برچسب‌ها
+
+print("X shape:", X.shape)  # تعداد نمونه‌ها و ویژگی‌ها
+print("y shape:", y.shape)
+
+
+# ۳) تقسیم داده به آموزش و تست
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+print("X_train shape:", X_train.shape)
+print("X_test shape:", X_test.shape)
+
+
+
+# ۴) استانداردسازی ویژگی‌ها
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)  # فقط روی داده آموزش fit شود
+X_test = scaler.transform(X_test)        # فقط transform روی داده تست
+
+# بررسی نمونه‌ای از داده‌ها
+print("X_train[0]:", X_train[0])
+print("X_test[0]:", X_test[0])
+
+
+
+# ۵) آموزش مدل KNN
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(X_train, y_train)
+
+
+
+# ۶) پیش‌بینی روی داده تست
+y_pred = knn.predict(X_test)
+
+# ۷) ارزیابی مدل
+accuracy = accuracy_score(y_test, y_pred)
+print("\nAccuracy:", accuracy)
+
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
+
+
+# ۸) نمودار بصری: نمونه‌های درست و غلط پیش‌بینی شده
+plt.figure(figsize=(8,5))
+plt.scatter(range(len(y_test)), y_test, label='Actual', marker='o')
+plt.scatter(range(len(y_test)), y_pred, label='Predicted', marker='x')
+plt.xlabel('Sample Index')
+plt.ylabel('Class')
+plt.title('Actual vs Predicted Labels')
+plt.legend()
+plt.show()
